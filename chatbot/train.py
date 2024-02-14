@@ -4,6 +4,8 @@ import json
 import torch
 from torch.utils.data import Dataset, DataLoader
 from utils import bag_of_words, tokenize, stem
+from model import TranNet
+import torch.nn as nn
 
 class ChatDataset(Dataset):
     def __init__(self, X_train, y_train):
@@ -20,10 +22,10 @@ class ChatDataset(Dataset):
         return self.n_samples
     
 class TrainData:
-    def __init__(self, data_file_path = 'data/demo.json', save_file_path = 'model/demo.pth'):
-        file_path = data_file_path
+    def __init__(self, data_file_path = 'intent.json', save_file_path = 'model/intent_model.pth'):
+        self.file_path = data_file_path
         self.save_file_path = save_file_path
-        with open(file_path, 'r') as f:
+        with open(self.file_path, 'r') as f:
             intents = json.load(f)
             
         self.all_words = []
@@ -31,7 +33,7 @@ class TrainData:
         xy = []
         # loop through each sentence in our intents patterns
         for intent in range(len(intents)):
-            tag = intents[intent]['tag']
+            tag = intents[intent]['intent']
             # add to tag list
             self.tags.append(tag)
             for pattern in intents[intent]['patterns']:
@@ -64,7 +66,7 @@ class TrainData:
             # y: PyTorch CrossEntropyLoss needs only class labels, not one-hot
             label = self.tags.index(tag)
             y_train.append(label)
-
+        
         X_train = np.array(X_train)
         y_train = np.array(y_train)
 
@@ -117,7 +119,13 @@ class TrainData:
             "all_words": self.all_words,
             "tags": self.tags
         }
+        
+        breakpoint()
 
         torch.save(data, self.save_file_path)
 
         print(f'training complete. file saved to {self.save_file_path}')
+        
+        
+model = TrainData()
+model.trainModel()
