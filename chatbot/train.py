@@ -119,8 +119,6 @@ class TrainData:
             "all_words": self.all_words,
             "tags": self.tags
         }
-        
-        breakpoint()
 
         torch.save(data, self.save_file_path)
 
